@@ -24,7 +24,7 @@ export default function AdminLogin() {
 
     try {
       // Basitleştirilmiş doğrulama - sadece admin/admin123 kontrolü
-      if (username === "admin" && password === "admin123") {
+      if (username === "admin" && password === "UZUMYMW-54473231..") {
         // Manuel olarak cookie ayarlayalım
         document.cookie = "auth-token=admin-token; path=/; max-age=604800" // 7 gün
 
