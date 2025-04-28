@@ -37,7 +37,7 @@ export default function AboutPage() {
             <div className="relative h-[400px] rounded-lg overflow-hidden shadow-xl">
               <Image
                 src="/images/image-1.webp"
-                alt="Global Health Organization Team"
+                alt="Global Health Organisation Team"
                 fill
                 className="object-cover"
               />
@@ -97,7 +97,7 @@ export default function AboutPage() {
             <div className="relative h-[400px] rounded-lg overflow-hidden shadow-xl">
               <Image
                 src="/images/hospital.webp"
-                alt="Why Choose Global Health Organization"
+                alt="Why Choose Global Health Organisation"
                 fill
                 className="object-cover"
               />

@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-
+import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useLanguage } from "./language-provider";
@@ -120,22 +120,21 @@ const Navbar = () => {
         <div className="container-custom flex justify-between items-center">
           <div className="flex items-center space-x-4">
             <div className="flex items-center">
-              <Phone className="h-4 w-4 mr-2" />
-              <span>+90 212 345 6789</span>
-            </div>
-            <div className="flex items-center">
               <Mail className="h-4 w-4 mr-2" />
-              <span>info@globalhealth.org</span>
+              <span>info@globalhealtorganisation.com</span>
             </div>
           </div>
           <div className="relative" ref={desktopLanguageDropdownRef}>
             <button
-              onClick={() => setDesktopLanguageDropdown(!desktopLanguageDropdown)}
+              onClick={() =>
+                setDesktopLanguageDropdown(!desktopLanguageDropdown)
+              }
               className="flex items-center hover:text-accent transition-colors"
             >
               <Globe className="h-4 w-4 mr-1" />
               <span className="font-medium">
-                {languages.find((lang) => lang.code === language)?.name || "Turkish"}
+                {languages.find((lang) => lang.code === language)?.name ||
+                  "Turkish"}
               </span>
               <ChevronDown className="h-3 w-3 ml-1" />
             </button>
@@ -171,12 +170,12 @@ const Navbar = () => {
       >
         <div className="container-custom flex justify-between items-center">
           <Link href="/" className="flex items-center">
-            <div className="bg-primary text-white p-2 rounded-md mr-2">
-              <span className="font-bold text-xl">G</span>
-            </div>
-            <span className="text-primary font-bold text-2xl">
-              Global Health Organization
-            </span>
+            <Image
+              src="/logo/globalhealtorganisation.svg"
+              alt="Global Health Organisation"
+              width={200}
+              height={100}
+            />
           </Link>
 
           {/* Desktop Navigation */}
@@ -229,7 +228,9 @@ const Navbar = () => {
           <div className="md:hidden flex items-center">
             <div className="relative mr-4" ref={mobileLanguageDropdownRef}>
               <button
-                onClick={() => setMobileLanguageDropdown(!mobileLanguageDropdown)}
+                onClick={() =>
+                  setMobileLanguageDropdown(!mobileLanguageDropdown)
+                }
                 className="text-gray-700 hover:text-primary"
               >
                 <Globe className="h-5 w-5" />

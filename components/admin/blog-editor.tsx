@@ -1,54 +1,65 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent } from "@/components/ui/card"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
-import { AlertCircle, Save, ImageIcon } from "lucide-react"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import TiptapEditor from "./tiptap-editor"
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { AlertCircle, Save, ImageIcon } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import TiptapEditor from "./tiptap-editor";
 
 interface BlogEditorProps {
-  initialData?: any
-  isEditing?: boolean
+  initialData?: any;
+  isEditing?: boolean;
 }
 
-export default function BlogEditor({ initialData, isEditing = false }: BlogEditorProps) {
-  const [title, setTitle] = useState(initialData?.title || "")
-  const [slug, setSlug] = useState(initialData?.slug || "")
-  const [content, setContent] = useState(initialData?.content || "")
-  const [excerpt, setExcerpt] = useState(initialData?.excerpt || "")
-  const [featuredImage, setFeaturedImage] = useState(initialData?.featuredImage || "")
-  const [language, setLanguage] = useState(initialData?.language || "tr")
-  const [published, setPublished] = useState(initialData?.published === 1)
+export default function BlogEditor({
+  initialData,
+  isEditing = false,
+}: BlogEditorProps) {
+  const [title, setTitle] = useState(initialData?.title || "");
+  const [slug, setSlug] = useState(initialData?.slug || "");
+  const [content, setContent] = useState(initialData?.content || "");
+  const [excerpt, setExcerpt] = useState(initialData?.excerpt || "");
+  const [featuredImage, setFeaturedImage] = useState(
+    initialData?.featuredImage || ""
+  );
+  const [language, setLanguage] = useState(initialData?.language || "tr");
+  const [published, setPublished] = useState(initialData?.published === 1);
 
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
-  const [success, setSuccess] = useState("")
-  const [authenticated, setAuthenticated] = useState(false)
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [authenticated, setAuthenticated] = useState(false);
 
-  const router = useRouter()
+  const router = useRouter();
 
   // Check authentication on component mount
   useEffect(() => {
     const checkAuth = () => {
-      const hasAuthCookie = document.cookie.includes("auth-token=")
-      setAuthenticated(hasAuthCookie)
+      const hasAuthCookie = document.cookie.includes("auth-token=");
+      setAuthenticated(hasAuthCookie);
 
       if (!hasAuthCookie) {
-        console.warn("No auth cookie found in blog editor")
+        console.warn("No auth cookie found in blog editor");
       }
-    }
+    };
 
-    checkAuth()
-  }, [])
+    checkAuth();
+  }, []);
 
   // Auto-generate slug from title
   useEffect(() => {
@@ -58,31 +69,31 @@ export default function BlogEditor({ initialData, isEditing = false }: BlogEdito
           .toLowerCase()
           .replace(/[^\w\s-]/g, "")
           .replace(/\s+/g, "-")
-          .replace(/-+/g, "-"),
-      )
+          .replace(/-+/g, "-")
+      );
     }
-  }, [title, isEditing, slug])
+  }, [title, isEditing, slug]);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!title || !content) {
-      setError("Title and content are required")
-      return
+      setError("Title and content are required");
+      return;
     }
 
     // Check authentication before submitting
     if (!authenticated) {
-      setError("You are not authenticated. Please log in again.")
+      setError("You are not authenticated. Please log in again.");
       setTimeout(() => {
-        router.push("/admin/login")
-      }, 2000)
-      return
+        router.push("/admin/login");
+      }, 2000);
+      return;
     }
 
-    setLoading(true)
-    setError("")
-    setSuccess("")
+    setLoading(true);
+    setError("");
+    setSuccess("");
 
     const blogData = {
       title,
@@ -92,10 +103,10 @@ export default function BlogEditor({ initialData, isEditing = false }: BlogEdito
       featuredImage,
       language,
       published,
-    }
+    };
 
     try {
-      let response
+      let response;
 
       if (isEditing) {
         response = await fetch(`/api/blogs/${initialData.id}`, {
@@ -105,7 +116,7 @@ export default function BlogEditor({ initialData, isEditing = false }: BlogEdito
           },
           body: JSON.stringify(blogData),
           credentials: "include", // Important: include credentials to send cookies
-        })
+        });
       } else {
         response = await fetch("/api/blogs", {
           method: "POST",
@@ -114,37 +125,41 @@ export default function BlogEditor({ initialData, isEditing = false }: BlogEdito
           },
           body: JSON.stringify(blogData),
           credentials: "include", // Important: include credentials to send cookies
-        })
+        });
       }
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (!response.ok) {
         if (response.status === 401) {
-          throw new Error("Authentication failed. Please log in again.")
+          throw new Error("Authentication failed. Please log in again.");
         }
-        throw new Error(data.error || "Failed to save blog post")
+        throw new Error(data.error || "Failed to save blog post");
       }
 
-      setSuccess(isEditing ? "Blog post updated successfully!" : "Blog post created successfully!")
+      setSuccess(
+        isEditing
+          ? "Blog post updated successfully!"
+          : "Blog post created successfully!"
+      );
 
       // Redirect after a short delay
       setTimeout(() => {
-        router.push("/admin/dashboard")
-      }, 1500)
+        router.push("/admin/dashboard");
+      }, 1500);
     } catch (err: any) {
-      setError(err.message || "An error occurred")
+      setError(err.message || "An error occurred");
 
       // If authentication error, redirect to login
       if (err.message.includes("Authentication failed")) {
         setTimeout(() => {
-          router.push("/admin/login")
-        }, 2000)
+          router.push("/admin/login");
+        }, 2000);
       }
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <form onSubmit={handleSubmit}>
@@ -226,30 +241,40 @@ export default function BlogEditor({ initialData, isEditing = false }: BlogEdito
                   placeholder="https://example.com/image.jpg"
                   className="flex-1"
                 />
-                <Button type="button" variant="outline" className="ml-2">
-                  <ImageIcon className="h-4 w-4 mr-2" />
-                  Browse
-                </Button>
               </div>
             </div>
 
             <div>
               <Label htmlFor="content">Content</Label>
               <div className="mt-1">
-                <TiptapEditor content={content} onChange={setContent} placeholder="Write your blog content here..." />
+                <TiptapEditor
+                  content={content}
+                  onChange={setContent}
+                  placeholder="Write your blog content here..."
+                />
               </div>
             </div>
 
             <div className="flex items-center space-x-2">
-              <Switch id="published" checked={published} onCheckedChange={setPublished} />
-              <Label htmlFor="published">Publish immediately</Label>
+              <Switch
+                id="published"
+                checked={published}
+                onCheckedChange={setPublished}
+              />
+              <Label htmlFor="published">
+                Publish immediately (If you want to publish directly)
+              </Label>
             </div>
           </div>
         </CardContent>
       </Card>
 
       <div className="flex justify-between">
-        <Button type="button" variant="outline" onClick={() => router.push("/admin/dashboard")}>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => router.push("/admin/dashboard")}
+        >
           Cancel
         </Button>
 
@@ -259,5 +284,5 @@ export default function BlogEditor({ initialData, isEditing = false }: BlogEdito
         </Button>
       </div>
     </form>
-  )
+  );
 }

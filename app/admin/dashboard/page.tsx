@@ -1,58 +1,73 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { PlusCircle, Settings } from "lucide-react"
-import AdminBlogList from "@/components/admin/blog-list"
-import AdminHeader from "@/components/admin/header"
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PlusCircle, Settings } from "lucide-react";
+import AdminBlogList from "@/components/admin/blog-list";
+import AdminHeader from "@/components/admin/header";
 
 interface BlogStats {
-  total: number
-  turkish: number
-  english: number
-  arabic: number
+  total: number;
+  turkish: number;
+  english: number;
+  arabic: number;
 }
 
 export default function AdminDashboard() {
-  const [loading, setLoading] = useState(true)
-  const [authenticated, setAuthenticated] = useState(false)
+  const [loading, setLoading] = useState(true);
+  const [authenticated, setAuthenticated] = useState(false);
   const [blogStats, setBlogStats] = useState<BlogStats>({
     total: 0,
     turkish: 0,
     english: 0,
     arabic: 0,
-  })
-  const router = useRouter()
+  });
+  const router = useRouter();
 
   useEffect(() => {
-    // Basitleştirilmiş auth kontrolü - cookie varlığını kontrol et
-    const checkAuth = () => {
-      const hasAuthCookie = document.cookie.includes("auth-token=")
+    const checkAuth = async () => {
+      try {
+        const response = await fetch("/api/auth/check", {
+          method: "GET",
+          credentials: "include", // Cookie'yi de gönder
+        });
 
-      if (hasAuthCookie) {
-        console.log("Auth cookie found, user is authenticated")
-        setAuthenticated(true)
-        fetchBlogStats()
-      } else {
-        console.log("No auth cookie found, redirecting to login")
-        router.push("/admin/login")
+        const data = await response.json();
+
+        if (data.authenticated) {
+          console.log("User is authenticated");
+          setAuthenticated(true);
+          fetchBlogStats();
+        } else {
+          console.log("User is not authenticated, redirecting");
+          router.push("/admin/login");
+        }
+      } catch (error) {
+        console.error("Error checking auth:", error);
+        router.push("/admin/login");
       }
-    }
+    };
 
-    checkAuth()
-  }, [router])
+    checkAuth();
+  }, [router]);
 
   const fetchBlogStats = async () => {
     try {
-      const response = await fetch("/api/blogs?language=all")
+      const response = await fetch("/api/blogs?language=all");
       if (!response.ok) {
-        throw new Error("Failed to fetch blogs")
+        throw new Error("Failed to fetch blogs");
       }
 
-      const blogs = await response.json()
+      const blogs = await response.json();
 
       // Calculate stats
       const stats = {
@@ -60,32 +75,32 @@ export default function AdminDashboard() {
         turkish: blogs.filter((blog: any) => blog.language === "tr").length,
         english: blogs.filter((blog: any) => blog.language === "en").length,
         arabic: blogs.filter((blog: any) => blog.language === "ar").length,
-      }
+      };
 
-      setBlogStats(stats)
+      setBlogStats(stats);
     } catch (error) {
-      console.error("Error fetching blog stats:", error)
+      console.error("Error fetching blog stats:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleLogout = () => {
     // Cookie'yi sil
-    document.cookie = "auth-token=; path=/; max-age=0"
-    router.push("/admin/login")
-  }
+    document.cookie = "auth-token=; path=/; max-age=0";
+    router.push("/admin/login");
+  };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
       </div>
-    )
+    );
   }
 
   if (!authenticated) {
-    return null // Will redirect in useEffect
+    return null; // Will redirect in useEffect
   }
 
   return (
@@ -106,7 +121,9 @@ export default function AdminDashboard() {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle>Total Blog Posts</CardTitle>
-                <CardDescription>All published and draft articles</CardDescription>
+                <CardDescription>
+                  All published and draft articles
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold">{blogStats.total}</div>
@@ -121,11 +138,15 @@ export default function AdminDashboard() {
                 <div className="flex justify-between">
                   <div>
                     <div className="text-sm font-medium">Turkish</div>
-                    <div className="text-2xl font-bold">{blogStats.turkish}</div>
+                    <div className="text-2xl font-bold">
+                      {blogStats.turkish}
+                    </div>
                   </div>
                   <div>
                     <div className="text-sm font-medium">English</div>
-                    <div className="text-2xl font-bold">{blogStats.english}</div>
+                    <div className="text-2xl font-bold">
+                      {blogStats.english}
+                    </div>
                   </div>
                   <div>
                     <div className="text-sm font-medium">Arabic</div>
@@ -183,5 +204,5 @@ export default function AdminDashboard() {
         </div>
       </main>
     </div>
-  )
+  );
 }

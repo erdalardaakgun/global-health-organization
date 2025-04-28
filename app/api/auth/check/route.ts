@@ -1,27 +1,37 @@
-import { type NextRequest, NextResponse } from "next/server"
+import { type NextRequest, NextResponse } from "next/server";
+import { verifyAuthToken } from "@/lib/auth";
 
 export async function GET(request: NextRequest) {
   try {
-    // Doğrudan cookie'yi kontrol edelim
-    const token = request.cookies.get("auth-token")?.value
+    // Cookie'den token al
+    const token = request.cookies.get("auth-token")?.value;
 
-    console.log("Auth check - token exists:", !!token)
+    console.log("Auth check - token exists:", !!token);
 
-    // Basitleştirilmiş kontrol - token varsa yeterli
     if (!token) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Token varsa kullanıcıyı doğrulanmış kabul edelim
+    // Tokenı çözümle ve doğrula
+    const auth = verifyAuthToken(token);
+
+    if (!auth) {
+      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+    }
+
+    // Token geçerliyse kullanıcıyı authenticated kabul et
     return NextResponse.json({
       authenticated: true,
       user: {
-        username: "admin",
-        role: "admin",
+        username: auth.username,
+        role: auth.role,
       },
-    })
+    });
   } catch (error) {
-    console.error("Auth check error:", error)
-    return NextResponse.json({ error: "Authentication check failed" }, { status: 500 })
+    console.error("Auth check error:", error);
+    return NextResponse.json(
+      { error: "Authentication check failed" },
+      { status: 500 }
+    );
   }
 }
