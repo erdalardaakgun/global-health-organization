@@ -104,7 +104,7 @@ export default function ContactPage() {
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-center gap-8">
-            <Card className="hover:shadow-lg transition-shadow w-80 h-fit">
+            {/* <Card className="hover:shadow-lg transition-shadow w-80 h-fit">
               <CardContent className="p-6 flex flex-col items-center text-center h-full">
                 <div className="bg-primary/10 p-3 rounded-full mb-4">
                   <Phone className="h-6 w-6 text-primary" />
@@ -115,7 +115,7 @@ export default function ContactPage() {
                 <p className="text-gray-700">+90 212 345 6789</p>
                 <p className="text-gray-700">+90 212 987 6543</p>
               </CardContent>
-            </Card>
+            </Card> */}
 
             <Card className="hover:shadow-lg transition-shadow w-80 h-fit">
               <CardContent className="p-6 flex flex-col items-center text-center h-full">
