@@ -97,6 +97,7 @@ const Navbar = () => {
       ],
     },
     { href: "/blog", label: t("blog") },
+    { href: "/contact", label: t("contact") },
   ];
 
   // Handle dropdown toggle with stopPropagation
